@@ -4,24 +4,24 @@ var service;
 
 var markers = [];
 
+var placeMarkers = [];
+
 var current_location = null;
 
 var current_circle = null;
 
-var placeMarkers = [];
-
 var callSearchWithinTime = false;
 
-var CATEGORY_RADIUS = 7000;
+var CATEGORY_RADIUS = 8000;
 
 var iconBase = 'http://labs.google.com/ridefinder/images/';
 var icons = {
-  places: {
-    icon: iconBase + 'mm_20_green.png'
-  },
-  current: {
-    icon: 'http://www.google.com/mapfiles/marker.png'
-  }
+    places: {
+        icon: iconBase + 'mm_20_green.png'
+    },
+    current: {
+        icon: 'http://www.google.com/mapfiles/marker.png'
+    }
 };
 
 function initMap() {
@@ -65,10 +65,6 @@ function initMap() {
         var address = document.getElementById('search-within-time-text').value;
         OriginGeocoding(address);
     });
-
-    document.getElementById('search-within-time-here').addEventListener('click', function () {
-        searchWithinTime(map.getCenter());
-    });
 }
 
 function hideMarkers() {
@@ -84,7 +80,7 @@ function deleteMarkers() {
 
 function setMarkerCurrentLocation(location) {
     console.log(location);
-    if(current_location !== null) current_location.setMap(null);
+    if (current_location !== null) current_location.setMap(null);
 
     current_location = new google.maps.Marker({
         map: map,
@@ -97,7 +93,7 @@ function setMarkerCurrentLocation(location) {
     });
     infowindow.open(map, current_location);
 
-    if(current_circle != null) current_circle.setMap(null);
+    if (current_circle != null) current_circle.setMap(null);
     drawCircle(map.getCenter(), CATEGORY_RADIUS);
 }
 
@@ -142,7 +138,7 @@ function searchWithinCategory(center) {
     var mode = document.getElementById('gift').value;
     var location;
 
-    if(typeof center === 'undefined') location = map.getCenter();
+    if (typeof center === 'undefined') location = map.getCenter();
     else location = center;
 
     var request = {
@@ -163,7 +159,7 @@ function nearbySearchCallback(results, status) {
         }
     }
 
-    if(callSearchWithinTime) {
+    if (callSearchWithinTime) {
         searchWithinTime();
         callSearchWithinTime = false;
     }
@@ -206,62 +202,60 @@ function searchWithinTime(here) {
 }
 
 function displayMarkersWithinTime(response) {
-    
+
     var maxDuration = document.getElementById('max-duration').value;
     var origins = response.originAddresses;
     var destinations = response.destinationAddresses;
 
     var atLeastOne = false;
     var maximumDistance = 0;
-    for (var i = 0; i < destinations.length; i++) {
-        var results = response.rows[0].elements;
-        for (var j = 0; j < results.length; j++) {
-            var element = results[j];
-            if (element.status === "OK") {
-                // The distance is returned in feet, but the TEXT is in miles. If we wanted to switch
-                // the function to show markers within a user-entered DISTANCE, we would need the
-                // value for distance, but for now we only need the text.
-                var distanceText = element.distance.text;
-                // Duration value is given in seconds so we make it MINUTES. We need both the value
-                // and the text.
-                var duration = element.duration.value / 60;
-                var durationText = element.duration.text;
-                if (duration <= maxDuration) {
-                    //the origin [i] should = the markers[i]
-                    markers[i].setMap(map);
-                    atLeastOne = true;
-                    // Create a mini infowindow to open immediately and contain the
-                    // distance and duration
-                    var infowindow = new google.maps.InfoWindow({
-                        content: durationText + ' away, ' + distanceText +
-                            '<div><input type=\"button\" value=\"View Route\" onclick =' +
-                            '\"displayDirections(&quot;' + destinations[i] + '&quot;);\"></input></div>'
-                    });
-                    infowindow.open(map, markers[i]);
-                    // Put this in so that this small window closes if the user clicks
-                    // the marker, when the big infowindow opens
-                    markers[i].infowindow = infowindow;
-                    google.maps.event.addListener(markers[i], 'click', function () {
-                        this.infowindow.close();
-                    });
-                }
-                if (Number(distanceText.split(" ")[0]) > maximumDistance) {
-                    maximumDistance = Number(distanceText.split(" ")[0]);
-                }
+
+    var results = response.rows[0].elements;
+    for (var i = 0; i < results.length; i++) {
+        var element = results[i];
+        //console.log(element);     
+        if (element.status === "OK") {
+            // The distance is returned in feet, but the TEXT is in miles. If we wanted to switch
+            // the function to show markers within a user-entered DISTANCE, we would need the
+            // value for distance, but for now we only need the text.
+            var distanceText = element.distance.text;
+            // Duration value is given in seconds so we make it MINUTES. We need both the value
+            // and the text.
+            var duration = element.duration.value / 60;
+            var durationText = element.duration.text;
+            if (duration <= maxDuration) {
+                //the origin [i] should = the markers[i]
+                markers[i].setMap(map);
+                atLeastOne = true;
+                // Create a mini infowindow to open immediately and contain the
+                // distance and duration
+                var infowindow = new google.maps.InfoWindow({
+                    content: durationText + ' away, ' + distanceText
+                });
+                infowindow.open(map, markers[i]);
+                // Put this in so that this small window closes if the user clicks
+                // the marker, when the big infowindow opens
+                markers[i].infowindow = infowindow;
+                google.maps.event.addListener(markers[i], 'click', function () {
+                    this.infowindow.close();
+                });
+            }
+            if (Number(distanceText.split(" ")[0]) > maximumDistance) {
+                maximumDistance = Number(distanceText.split(" ")[0]);
             }
         }
-        }
-        if (!atLeastOne) {
-            window.alert('We could not find any locations within that distance!');
-        }
     }
+    if (!atLeastOne) {
+        window.alert('We could not find any locations within that distance!');
+    }
+}
 
 function OriginGeocoding(newAddress) {
     var address = newAddress;
     var geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address: address }, function (results, status) {
         if (status == 'OK') {
-            var originGeocode =  results[0].geometry.location;
+            var originGeocode = results[0].geometry.location;
             map.setCenter(originGeocode);
             setMarkerCurrentLocation(originGeocode);
             searchWithinCategory(originGeocode);
@@ -280,23 +274,23 @@ function displayDirections(origin) {
     // Get mode again from the user entered value.
     var mode = document.getElementById('mode').value;
     directionsService.route({
-      // The origin is the passed in marker's position.
-      origin: origin,
-      // The destination is user entered address.
-      destination: destinationAddress,
-      travelMode: google.maps.TravelMode[mode]
-    }, function(response, status) {
-      if (status === google.maps.DirectionsStatus.OK) {
-        var directionsDisplay = new google.maps.DirectionsRenderer({
-          map: map,
-          directions: response,
-          draggable: true,
-          polylineOptions: {
-            strokeColor: 'green'
-          }
-        });
-      } else {
-        window.alert('Directions request failed due to ' + status);
-      }
+        // The origin is the passed in marker's position.
+        origin: origin,
+        // The destination is user entered address.
+        destination: destinationAddress,
+        travelMode: google.maps.TravelMode[mode]
+    }, function (response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+            var directionsDisplay = new google.maps.DirectionsRenderer({
+                map: map,
+                directions: response,
+                draggable: true,
+                polylineOptions: {
+                    strokeColor: 'green'
+                }
+            });
+        } else {
+            window.alert('Directions request failed due to ' + status);
+        }
     });
-  }
+}

@@ -1,16 +1,72 @@
 /* ======= Show Recommend Place ======= */
 
-var recommendedpPlaceList = []
+//Recommended list will be changed every time when user click "Refresh" button / Change "Category" / Click "Go" button
 
-var recommended = function(data) {
+//TODO: Later these recommended places are filtered by some third-party rating,
 
+var test_photo = "http://www.bharatint.com/img/categories/our-cat-shop-image.png";
+var test_name = "Bob";
+var test_time = "9:00 - 6:00";
+var test_likes = "45";
+var test_reviews = "5";
+
+var test_photo1 = "http://www.bharatint.com/img/categories/our-cat-shop-image.png";
+var test_name1 = "robin";
+var test_time1 = "10:00 - 6:00";
+var test_likes1 = "77";
+var test_reviews1 = "17";
+
+var recommendedpPlaceList = [
+    {
+        photo: test_photo, //foursquare Get Details of a Venue
+        name: test_name, //foursquare Get Details of a Venue
+        time: test_time, //foursquare Get Details of a Venue
+        likes: test_likes, //foursquare Get Details of a Venue
+        reviews: test_reviews //foursquare Get Details of a Venue
+    },
+    {
+        photo: test_photo1,
+        name: test_name1,
+        time: test_time1,
+        likes: test_likes1,
+        reviews: test_reviews1
+    }
+];
+
+var recommendedItem = function(data) {
+    this.photo = ko.observable(data.photo);
+    this.name = ko.observable(data.name);
+    this.time = ko.observable(data.time);
+    this.rating = ko.observable(data.rating);
+    this.reviews = ko.observable(data.reviews);
+
+    this.gotoPlace = function() {
+        alert("goto is clicked!!!");
+    }
 }
 
 var ViewModel = function() {
+    var self = this;
 
+    //Make recommendedPlaceList with google map and third-party api
+    //window.foursquareExplore.doRequest();
+    window.foursquareSearch.doRequest();
+
+    //Connect recommendedPlaceList by observables
+    this.recommendedPlaces = ko.observableArray([]);
+
+    recommendedpPlaceList.forEach(function(data) {
+         self.recommendedPlaces.push(new recommendedItem(data));
+    })
+
+    //sorting rearrangement
+    this.sorting = ko.observableArray(['rating', 'newly', 'reviews']);
+
+    //filtering rearrangement
+    this.filterTitle = ko.observable();
 }
 
-
+ko.applyBindings(new ViewModel());
 
 
 

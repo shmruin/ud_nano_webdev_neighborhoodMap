@@ -40,29 +40,52 @@
               <option value="10">10 min</option>
               <option value="15">20 min</option>
               <option value="30">30 min</option>
-              <option value="60">1 hour</option>
             </select>
             <select id="mode">
-              <option value="DRIVING">drive</option>
-              <option value="WALKING">walk</option>
-              <option value="BICYCLING">bike</option>
-              <option value="TRANSIT">transit ride</option>
+              <option value="DRIVING">Drive</option>
+              <option value="WALKING">Walk</option>
+              <option value="BICYCLING">Bike</option>
+              <option value="TRANSIT">Transit Ride</option>
             </select>
             <span class="text">from</span>
             <input id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY">
             <input id="search-within-time" type="button" value="Go">
-            <input id="search-within-time-here" type="button" value="Here!!!">
             <hr>
-            <label>... Or how about these places?</label>
-            <ul>
-              <li>test list</li>
-            </ul>
+            <label>... Or how about these places? &nbsp;</label>
+            <select data-bind="options: sorting"></select>
+            <input data-bind="text: filterTitle" id="search-list-text" type="text" placeholder="I want to search places by name!">
+            <div class="scrollable-table">
+              <table id="placeTable">
+                <thead>
+                  <tr>
+                    <th id="photo">Photo</th>
+                    <th id="name">Name</th>
+                    <th id="time">Time</th>
+                    <th id="rating">Rating</th>
+                    <th id="reviews">Reviews</th>
+                    <th id="go"></th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: recommendedPlaces">
+                  <tr>
+                    <td><img class="rounded-img" data-bind="attr: {src: $data.photo}"></td>
+                    <td data-bind="text: $data.name"></td>
+                    <td data-bind="text: $data.time"></td>
+                    <td data-bind="text: $data.rating"></td>
+                    <td data-bind="text: $data.reviews"></td>
+                    <td><button data-bind="click: $parent.gotoPlace">See</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         <div id="map"></div>
       </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type='text/javascript' src='knockout-3.4.2.js'></script>
-    <script src="recommendList.js"></script>
     <script src="map.js"></script>
+    <script src="foursquare.js"></script>
+    <script src="recommendList.js"></script>
     <script async defer
         src=
         "https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyAC5C50h9LZpQpa4YLtaViVGhw-GYCDeTg&v=3&callback=initMap">

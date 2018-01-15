@@ -55,3 +55,30 @@ html,
       .text {
         font-size: 12px;
       }
+
+      #search-list-text {
+        width: 94%;
+      }
+
+      .rounded-img {
+        display: block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+
+      .scrollable-table tbody {
+        display:block;
+        max-height:300px;
+        overflow-y:scroll;
+        }
+        
+        .scrollable-table thead, tbody tr {
+        display:table;
+        width:100%;
+        table-layout:fixed;
+        }
+
+      td, th {
+        text-align: center;
+      }
