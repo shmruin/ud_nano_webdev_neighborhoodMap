@@ -12,7 +12,7 @@ var current_circle = null;
 
 var callSearchWithinTime = false;
 
-var CATEGORY_RADIUS = 8000;
+var CATEGORY_RADIUS = 10000;
 
 var iconBase = 'http://labs.google.com/ridefinder/images/';
 var icons = {
@@ -102,7 +102,8 @@ function createMarker(place) {
     var marker = new google.maps.Marker({
         map: map,
         icon: icons['places'].icon,
-        position: place.geometry.location
+        position: place.geometry.location,
+        title: place.name
     });
 
     google.maps.event.addListener(marker, 'click', function () {

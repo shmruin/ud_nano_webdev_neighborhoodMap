@@ -25,20 +25,20 @@
           <h1>Find an Awesome Gift!</h1>
           <div>
             <label for="gift">I want to buy a ... </label>
-            <select name="gift-category" id="gift">
+            <select data-bind="event: {change: categoryChanged}" name="gift-category" id="gift">
               <option value="liquor_store">Liquor</option>
               <option value="florist">Flower</option>
               <option value="book_store">Book</option>
               <option value="jewelry_store">Jewel</option>
             </select>
-            <input id="search-within-category" type="button" value="Refresh">
+            <input data-bind="click: categoryButtonClicked" id="search-within-category" type="button" value="Refresh">
           </div>
           <hr>
           <div>
             <label for="max-duration">In the place within ... </label>
             <select id="max-duration">
               <option value="10">10 min</option>
-              <option value="15">20 min</option>
+              <option value="20">20 min</option>
               <option value="30">30 min</option>
             </select>
             <select id="mode">
@@ -49,7 +49,7 @@
             </select>
             <span class="text">from</span>
             <input id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY">
-            <input id="search-within-time" type="button" value="Go">
+            <input data-bind="click: searchTimeButtonClicked" id="search-within-time" type="button" value="Go">
             <hr>
             <label>... Or how about these places? &nbsp;</label>
             <select data-bind="options: sorting"></select>
@@ -60,7 +60,7 @@
                   <tr>
                     <th id="photo">Photo</th>
                     <th id="name">Name</th>
-                    <th id="time">Time</th>
+                    <th id="time">Menu</th>
                     <th id="rating">Rating</th>
                     <th id="reviews">Reviews</th>
                     <th id="go"></th>
@@ -70,9 +70,9 @@
                   <tr>
                     <td><img class="rounded-img" data-bind="attr: {src: $data.photo}"></td>
                     <td data-bind="text: $data.name"></td>
-                    <td data-bind="text: $data.time"></td>
-                    <td data-bind="text: $data.rating"></td>
-                    <td data-bind="text: $data.reviews"></td>
+                    <td><a data-bind="attr: {href: $data.menu}">Menu</a></td>
+                    <td data-bind="text: $data.phone"></td>
+                    <td data-bind="text: $data.checkin"></td>
                     <td><button data-bind="click: $parent.gotoPlace">See</button></td>
                   </tr>
                 </tbody>
