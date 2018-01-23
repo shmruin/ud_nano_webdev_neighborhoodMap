@@ -14,6 +14,10 @@ var callSearchWithinTime = false;
 
 var CATEGORY_RADIUS = 10000;
 
+var vmFlag = false;
+
+var sqInfowindow = null;
+
 var iconBase = 'http://labs.google.com/ridefinder/images/';
 var icons = {
     places: {
@@ -76,10 +80,21 @@ function hideMarkers() {
 function deleteMarkers() {
     hideMarkers();
     markers = [];
+    deleteRecommendedList();
+}
+
+function deleteRecommendedList() {
+    recommendedpPlaceList = [];
+}
+
+function openInfowindow(component) {
+    var infowindow = new google.maps.InfoWindow({
+        content: component.name()
+    });
+    infowindow.open(map, component.marker);
 }
 
 function setMarkerCurrentLocation(location) {
-    console.log(location);
     if (current_location !== null) current_location.setMap(null);
 
     current_location = new google.maps.Marker({
@@ -112,6 +127,8 @@ function createMarker(place) {
     });
 
     markers.push(marker);
+
+    makeRecommendedpPlaceList(marker, place);
 }
 
 function handleLocationError(browserHasGeolocation, infowindow, pos) {
@@ -164,6 +181,9 @@ function nearbySearchCallback(results, status) {
         searchWithinTime();
         callSearchWithinTime = false;
     }
+
+    //After all markers are created
+    vmFlag = true;
 }
 
 function searchWithinTime(here) {
@@ -293,5 +313,75 @@ function displayDirections(origin) {
         } else {
             window.alert('Directions request failed due to ' + status);
         }
+    });
+}
+
+//make list in recommendList.js
+function makeRecommendedpPlaceList(marker, place) {
+    var recommendedComponent = {
+        marker: marker,
+        name: place.name,
+        icon: place.icon,
+        rating: place.rating,
+        open: function() {
+            if(place.hasOwnProperty('opening_hours')) {
+                return place.opening_hours.open_now === true ? "Y" : "N";
+            } else {
+                return "-";
+            }
+        }(),
+    };
+
+    window.recommendedpPlaceList.push(recommendedComponent);
+}
+
+function WatingListComplete() {
+    var defer = $.Deferred();
+
+    var checkExist = setInterval(function() {
+        if (vmFlag === true) {
+           console.log("vmFlag on!");
+           vmFlag = false;
+           clearInterval(checkExist);
+           defer.resolve(); //defer resolved
+        }
+     }, 50); // check every 50ms
+
+    return defer;
+}
+
+function open4sqWindowInfo(recommendedItem) {
+ 
+    //Request to foursquare by recPlace info
+    var lat = recommendedItem.marker.position.lat();
+    var lng = recommendedItem.marker.position.lng();
+    var name = recommendedItem.name();
+
+    window.foursquareSearch['location'] = lat + ',' + lng;
+    window.foursquareSearch['name'] = name;
+    
+    window.foursquareSearch.setListElements(recommendedItem.marker).then(function(res) {
+        //Make and Open special window info of 4sq
+        console.log(res);
+
+        if(sqInfowindow !== null) {
+            sqInfowindow.close();
+        }
+        
+        if(res !== null) {
+            sqInfowindow = new google.maps.InfoWindow({
+                content: '<h5>Name: ' + res.name + '</h5>' +
+                '<h5>Check-in: ' + res.checkin + '</h5>' +
+                '<h5>Url: ' + res.url + '</h5>' +
+                '<div style="text-align: center;"><img src="' + res.photo[0] + '"/></div>'
+            });
+        } else {
+            sqInfowindow = new google.maps.InfoWindow({
+                content: name
+            });
+        }
+
+        sqInfowindow.open(map, recommendedItem.marker);
+        map.setCenter(recommendedItem.marker.position);
     });
 }

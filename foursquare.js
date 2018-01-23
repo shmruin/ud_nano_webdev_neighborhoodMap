@@ -18,11 +18,15 @@ var foursquareSearch = {
         });
     },
     getJson: function(url, callback){ //get response by json format
-        $.getJSON(url, function(data) {
-          callback(data);
+        //$.getJSON will return a Promise
+        var res;
+        return $.getJSON(url, function(data) {
+         res = callback(data);
+        }).then(function() {
+            return res;
         });
     },
-    setListElements: function() { //get response and return a list object for recommendedList
+    setListElements: function(marker) { //get response and return a list object for recommendedList
         var url = "https://api.foursquare.com/v2/venues/search";
         url += "?client_id=" + this.clientId;
         url += "&client_secret=" + this.clientSecret;
@@ -30,7 +34,13 @@ var foursquareSearch = {
         url += "&name=" + this.name;
         url += "&intent=" + this.intent
         url += "&v=" + this.version;
-        this.getJson(url, function(data) {
+
+        var self = this;
+
+        return this.getJson(url, function(data) {
+
+            var component = {};
+
             if(data['meta']['code'] !== 200) {
                 console.log("Request Failed by response " + data['meta']['code']);
                 return null;
@@ -42,37 +52,79 @@ var foursquareSearch = {
                 return null;
             }
 
-            var res_photo = "http://www.bharatint.com/img/categories/our-cat-shop-image.png";
+            //var res_photo = [];
             var res_name = "NO_NAME";
-            var res_menuURL = "NO_MENU";
-            var res_phone = "-";
+            var res_url = "-";
             var res_checkin = "-";
+            var res_marker = marker;
 
             if(res.hasOwnProperty('categories') && res['categories'][0].hasOwnProperty('icon')) {
-                res_photo = res['categories'][0]['icon']['prefix'] + res['categories'][0]['icon']['suffix'];
+                res_photo = res['categories'][0]['icon']['prefix'] + "bg_32" + res['categories'][0]['icon']['suffix'];
             }
             if(res.hasOwnProperty('name')) {
                 res_name = res['name'];
             }
-            if(res.hasOwnProperty('menu')) {
-                res_menuURL = res['menu']['url'];
-            }
-            if(res.hasOwnProperty('contact')) {
-                res_phone = res['contact']['formattedPhone'];
+            if(res.hasOwnProperty('url')) {
+                res_url = res['url']
             }
             if(res.hasOwnProperty('stats')) {
                 res_checkin = res['stats']['checkinsCount'];
             }
 
-            var component = {
-                photo: res_photo,
-                name: res_name,
-                menu: res_menuURL,
-                phone: res_phone,
-                checkin: res_checkin
+            //Get photo urls by a request
+            var id = res['id'];
+
+            return self.getPhotos(id).then(function(res_photo) {
+                //data for info windows
+                component['photo'] = res_photo;
+                component['name'] = res_name;
+                component['url'] = res_url;
+                component['checkin'] = res_checkin;
+                component['marker'] = res_marker;
+
+                return component;
+            })
+            
+        }).then(function(res) {
+            console.log(res);
+            return res;
+        });;
+    },
+    getPhotos: function(id) {
+        var self = this;
+
+        var defer = $.Deferred();
+
+        var url = "https://api.foursquare.com/v2/venues/" + id + "/photos";
+        url += "?client_id=" + this.clientId;
+        url += "&client_secret=" + this.clientSecret;
+        url += "&v=" + this.version;
+
+        return this.getJson(url, function(data) {
+
+            var ans = [];
+
+            if(data['meta']['code'] !== 200) {
+                console.log("Request Failed by response " + data['meta']['code']);
+                return null;
             }
 
-            window.recommendedpPlaceList.push(component);
+            var res = data['response']['photos']['items'];
+            if(res === undefined) {
+                console.log("No response value here.");
+                return null;
+            }
+
+            for(var i = 0; i < Math.min(res.length, 10); i++) {
+                //push photo url
+                ans.push(res[i].prefix + "100x100" + res[i].suffix);
+            }
+
+            return ans;
+        }).then(function(ans) {
+            //This will work after callback complete
+            defer.resolve();
+            return ans;
         });
     }
 }

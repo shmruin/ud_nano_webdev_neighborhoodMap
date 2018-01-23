@@ -62,14 +62,18 @@ html,
 
       .rounded-img {
         display: block;
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
+      }
+
+      .rounded-img:hover {
+        cursor: pointer;
       }
 
       .scrollable-table tbody {
         display:block;
-        max-height:300px;
+        max-height: 550px;
         overflow-y:scroll;
         }
         
@@ -81,4 +85,8 @@ html,
 
       td, th {
         text-align: center;
+      }
+
+      .td-th-name {
+        width: 50%;
       }

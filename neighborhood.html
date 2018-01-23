@@ -52,28 +52,23 @@
             <input data-bind="click: searchTimeButtonClicked" id="search-within-time" type="button" value="Go">
             <hr>
             <label>... Or how about these places? &nbsp;</label>
-            <select data-bind="options: sorting"></select>
             <input data-bind="text: filterTitle" id="search-list-text" type="text" placeholder="I want to search places by name!">
             <div class="scrollable-table">
               <table id="placeTable">
                 <thead>
                   <tr>
-                    <th id="photo">Photo</th>
-                    <th id="name">Name</th>
-                    <th id="time">Menu</th>
+                    <th id="icon">Icon</th>
+                    <th class="td-th-name" id="name">Name</th>
                     <th id="rating">Rating</th>
-                    <th id="reviews">Reviews</th>
-                    <th id="go"></th>
+                    <th id="open">Open</th>
                   </tr>
                 </thead>
                 <tbody data-bind="foreach: recommendedPlaces">
                   <tr>
-                    <td><img class="rounded-img" data-bind="attr: {src: $data.photo}"></td>
-                    <td data-bind="text: $data.name"></td>
-                    <td><a data-bind="attr: {href: $data.menu}">Menu</a></td>
-                    <td data-bind="text: $data.phone"></td>
-                    <td data-bind="text: $data.checkin"></td>
-                    <td><button data-bind="click: $parent.gotoPlace">See</button></td>
+                    <td><img class="rounded-img" data-bind="click: onClickIcon, attr: {src: $data.icon}"></td>
+                    <td class="td-th-name" data-bind="text: $data.name"></td>
+                    <td data-bind="text: $data.rating"></td>
+                    <td data-bind="text: $data.open"></td>
                   </tr>
                 </tbody>
               </table>
