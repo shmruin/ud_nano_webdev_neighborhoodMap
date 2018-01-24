@@ -1,6 +1,6 @@
 # ud_nano_webdev_neighborhoodMap
 
-![alt text](screenshots/neighborhood_map.png "ud_nano_webdev_neighborhoodMap View")
+![Alt text](/screenshots/neighborhood_map.png?raw=true "ud_nano_webdev_neighborhoodMap View")
 
 # Introduction
 This project provides a simple app for 'Neighborhood Map' project in Udacity.
@@ -32,7 +32,7 @@ This project meets up the main properties below.
 
 # How to Run & Features
 
-* Run neighborhood.html to use this program.
+* Run `neighborhood.html` to use this program.
 * First location is set to 'Washington', US
 * Gift category(Liquor, Flower, Book, Jewel) can be selected - the marker immediately change, or you can just 'refresh' at any place.
 * Secondly, distance matrix also works; you can find some category-base shops in proper time from specific place.
