@@ -1,6 +1,6 @@
 # ud_nano_webdev_neighborhoodMap
 
-![Alt text](/screenshots/neighborhood_map.png?raw=true "ud_nano_webdev_neighborhoodMap View")
+![Alt text](screenshots/neighborhood_map.PNG?raw=true "ud_nano_webdev_neighborhoodMap View")
 
 # Introduction
 This project provides a simple app for 'Neighborhood Map' project in Udacity.
