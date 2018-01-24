@@ -1,16 +1,13 @@
 /* ======= Show Recommend Place ======= */
 
-//Recommended list will be changed every time when user click "Refresh" button / Change "Category" / Click "Go" button
-
-//TODO: Later these recommended places are filtered by some third-party rating,
-
+//Contents for the table left side
 var recommendedpPlaceList = [
     // {
     //     marker: "some_marker",
     //     name: "place_name",
     //     icon: "place_icon",
     //     rating: "place_rating",
-    //     open: "place_opennow",
+    //     open: "place_isOpenNow",
     // }
 ];
 
@@ -37,7 +34,7 @@ var ViewModel = function() {
     this.recommendedPlaces = ko.observableArray([]);
 
     var recommendedListChange = function() {
-        //synchronized function after 'WatingListComplete'
+        //List filling function works after 'WatingListComplete'
         window.WatingListComplete().then(resetList);
     }
 
@@ -49,7 +46,7 @@ var ViewModel = function() {
         });
     }
 
-    // list will be changed for the actions below
+    //list will be changed by the actions below
     this.categoryButtonClicked = recommendedListChange;
     this.searchTimeButtonClicked = recommendedListChange;
     this.categoryChanged = recommendedListChange;
@@ -57,8 +54,27 @@ var ViewModel = function() {
     //init
     recommendedListChange();
 
-    //filtering rearrangement
+    //filtering table items by their name
     this.filterTitle = ko.observable();
+
+    this.searchKeyUp = function (d, e) {
+        if (e.keyCode == 13) { //if 'enter' key
+
+            var filtering = self.filterTitle();
+            
+            //1. filter recommendedpPlaceList
+            recommendedpPlaceList = recommendedpPlaceList.filter(function(item) {
+                return item.name.includes(filtering);
+            });
+
+            //2. Call marker reset function in map.js with recommendedpPlaceList's marker info
+            //   Reversal work of 'makeRecommendedpPlaceList'
+            window.makeMarkerList(recommendedpPlaceList);
+
+            //3. Create table
+            recommendedListChange();
+        }
+    }
 }
 
 ko.applyBindings(new ViewModel());

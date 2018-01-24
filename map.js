@@ -36,7 +36,6 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: initLocation,
         zoom: 13,
-        //styles: styles,
         mapTypeControl: false
     });
 
@@ -50,18 +49,21 @@ function initMap() {
     searchWithinCategory();
     setMarkerCurrentLocation(initLocation);
 
+    //Marker reset when 'Category' is changed
     document.getElementById('gift').addEventListener('change', function () {
         deleteMarkers();
         searchWithinCategory();
         setMarkerCurrentLocation(map.getCenter());
     });
 
+    //Marker reset when 'Refresh' Button is clicked
     document.getElementById('search-within-category').addEventListener('click', function () {
         deleteMarkers();
         searchWithinCategory();
         setMarkerCurrentLocation(map.getCenter());
     });
 
+    //Marker reset when user search places by distance with a location
     document.getElementById('search-within-time').addEventListener('click', function () {
         deleteMarkers();
 
@@ -77,10 +79,11 @@ function hideMarkers() {
     }
 }
 
+//Hide and Delete all markers in the map
 function deleteMarkers() {
     hideMarkers();
     markers = [];
-    deleteRecommendedList();
+    //deleteRecommendedList();
 }
 
 function deleteRecommendedList() {
@@ -94,6 +97,7 @@ function openInfowindow(component) {
     infowindow.open(map, component.marker);
 }
 
+//Show current center with a small info window
 function setMarkerCurrentLocation(location) {
     if (current_location !== null) current_location.setMap(null);
 
@@ -112,8 +116,7 @@ function setMarkerCurrentLocation(location) {
     drawCircle(map.getCenter(), CATEGORY_RADIUS);
 }
 
-function createMarker(place) {
-    var placeLoc = place.geometry.location;
+function createPlaceMarker(place) {
     var marker = new google.maps.Marker({
         map: map,
         icon: icons['places'].icon,
@@ -128,16 +131,11 @@ function createMarker(place) {
 
     markers.push(marker);
 
+    //To make recommendedpPlaceList in recommendList.js
     makeRecommendedpPlaceList(marker, place);
 }
 
-function handleLocationError(browserHasGeolocation, infowindow, pos) {
-    infowindow.setPosition(pos);
-    infowindow.setContent(browserHasGeolocation ?
-        'Error: The Geolocation service failed.' :
-        'Error: Your browser doesn\'t support geolocation.');
-}
-
+//Draw a circle area that markers are searched from current location
 function drawCircle(centerLocation, radius) {
     current_circle = new google.maps.Circle({
         strokeColor: '#FF0000',
@@ -151,6 +149,7 @@ function drawCircle(centerLocation, radius) {
     });
 }
 
+//Callback function
 function searchWithinCategory(center) {
     var initRadius = CATEGORY_RADIUS;
     var mode = document.getElementById('gift').value;
@@ -173,7 +172,7 @@ function nearbySearchCallback(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
             var place = results[i];
-            createMarker(results[i]);
+            createPlaceMarker(results[i]);
         }
     }
 
@@ -186,6 +185,7 @@ function nearbySearchCallback(results, status) {
     vmFlag = true;
 }
 
+//Callback function
 function searchWithinTime(here) {
     // Initialize the distance matrix service.
     var distanceMatrixService = new google.maps.DistanceMatrixService;
@@ -198,7 +198,8 @@ function searchWithinTime(here) {
     } else {
         hideMarkers();
 
-        var origin = address; //Should be searched address
+        //This should be searched address
+        var origin = address;
 
         var destinations = [];
         for (var i = 0; i < markers.length; i++) {
@@ -233,12 +234,10 @@ function displayMarkersWithinTime(response) {
 
     var results = response.rows[0].elements;
     for (var i = 0; i < results.length; i++) {
+
         var element = results[i];
-        //console.log(element);     
+
         if (element.status === "OK") {
-            // The distance is returned in feet, but the TEXT is in miles. If we wanted to switch
-            // the function to show markers within a user-entered DISTANCE, we would need the
-            // value for distance, but for now we only need the text.
             var distanceText = element.distance.text;
             // Duration value is given in seconds so we make it MINUTES. We need both the value
             // and the text.
@@ -335,12 +334,12 @@ function makeRecommendedpPlaceList(marker, place) {
     window.recommendedpPlaceList.push(recommendedComponent);
 }
 
+//RecommendList actions should be done after this is satisfied
 function WatingListComplete() {
     var defer = $.Deferred();
 
     var checkExist = setInterval(function() {
         if (vmFlag === true) {
-           console.log("vmFlag on!");
            vmFlag = false;
            clearInterval(checkExist);
            defer.resolve(); //defer resolved
@@ -350,6 +349,7 @@ function WatingListComplete() {
     return defer;
 }
 
+//Show a special info window when recommendList items's icon is clicked.
 function open4sqWindowInfo(recommendedItem) {
  
     //Request to foursquare by recPlace info
@@ -372,7 +372,7 @@ function open4sqWindowInfo(recommendedItem) {
             sqInfowindow = new google.maps.InfoWindow({
                 content: '<h5>Name: ' + res.name + '</h5>' +
                 '<h5>Check-in: ' + res.checkin + '</h5>' +
-                '<h5>Url: ' + res.url + '</h5>' +
+                '<h5>Url: <a href="' + res.url + '" target="_blank">' + res.url + '</a></h5>' +
                 '<div style="text-align: center;"><img src="' + res.photo[0] + '"/></div>'
             });
         } else {
@@ -384,4 +384,30 @@ function open4sqWindowInfo(recommendedItem) {
         sqInfowindow.open(map, recommendedItem.marker);
         map.setCenter(recommendedItem.marker.position);
     });
+}
+
+//make marker in map.js
+function makeMarkerList(recList) {
+
+    deleteMarkers();
+
+    //Put new markers
+    for(var i = 0; i < recList.length; i++) {
+
+        var marker = new google.maps.Marker({
+            map: map,
+            icon: icons['places'].icon,
+            position: recList[i].marker.position,
+            title: recList[i].name
+        });
+
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.setContent(this.title);
+            infowindow.open(map, this);
+        });
+
+        markers.push(marker);
+    }
+
+    vmFlag = true;
 }

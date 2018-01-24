@@ -41,21 +41,24 @@ var foursquareSearch = {
 
             var component = {};
 
+            //Request error by 200
             if(data['meta']['code'] !== 200) {
+                alert("Fail to get response from foursquare!");
                 console.log("Request Failed by response " + data['meta']['code']);
                 return null;
             }
 
+            //No proper response here
             var res = data['response']['venues'][0];
             if(res === undefined) {
+                alert("Fail to get response from foursquare!");
                 console.log("No response value here.");
                 return null;
             }
 
-            //var res_photo = [];
-            var res_name = "NO_NAME";
-            var res_url = "-";
-            var res_checkin = "-";
+            var res_name = "Unknown";
+            var res_url = "";
+            var res_checkin = "";
             var res_marker = marker;
 
             if(res.hasOwnProperty('categories') && res['categories'][0].hasOwnProperty('icon')) {
@@ -71,9 +74,9 @@ var foursquareSearch = {
                 res_checkin = res['stats']['checkinsCount'];
             }
 
-            //Get photo urls by a request
             var id = res['id'];
 
+            //Promise chain to get photo urls with a request
             return self.getPhotos(id).then(function(res_photo) {
                 //data for info windows
                 component['photo'] = res_photo;
@@ -104,11 +107,13 @@ var foursquareSearch = {
 
             var ans = [];
 
+            //Request error by 200
             if(data['meta']['code'] !== 200) {
                 console.log("Request Failed by response " + data['meta']['code']);
                 return null;
             }
 
+            //No proper response here
             var res = data['response']['photos']['items'];
             if(res === undefined) {
                 console.log("No response value here.");

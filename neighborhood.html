@@ -1,17 +1,3 @@
-<!-- 
-    Providing : location-category-base gift stores. be able to filtered by gift category. be able to filtered by location, can reflect user's current location instead.
-    location and gift category is listed on the left. search is only on the location list.
-    When marker is clicked - four square info is poped in infowindow. (+ add some awesome menu for users here if they provide)
-    Check if it is mobile responsive.
-
-    Steps :
-    1. Make basic UI with html.
-    2. Do knockoutjs structure. put location and gift category.
-    3. Google API request & response (maybe require place library).
-    4. Decorate with foursquare API.
-    5. Check other rubrics.
-    6. Profit.
- -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +38,7 @@
             <input data-bind="click: searchTimeButtonClicked" id="search-within-time" type="button" value="Go">
             <hr>
             <label>... Or how about these places? &nbsp;</label>
-            <input data-bind="text: filterTitle" id="search-list-text" type="text" placeholder="I want to search places by name!">
+            <input data-bind="value: filterTitle, valueUpdate: 'input', event: { keyup: searchKeyUp }" id="search-list-text" type="text" placeholder="I want to search places by name!">
             <div class="scrollable-table">
               <table id="placeTable">
                 <thead>
