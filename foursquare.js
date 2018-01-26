@@ -11,7 +11,7 @@ var foursquareSearch = {
         url += "&client_secret=" + this.clientSecret;
         url += "&ll=" + this.location;
         url += "&name=" + this.name;
-        url += "&intent=" + this.intent
+        url += "&intent=" + this.intent;
         url += "&v=" + this.version;
         this.getJson(url, function(data){
             console.log("doRequest: ",data);
@@ -32,7 +32,7 @@ var foursquareSearch = {
         url += "&client_secret=" + this.clientSecret;
         url += "&ll=" + this.location;
         url += "&name=" + this.name;
-        url += "&intent=" + this.intent
+        url += "&intent=" + this.intent;
         url += "&v=" + this.version;
 
         var self = this;
@@ -42,14 +42,14 @@ var foursquareSearch = {
             var component = {};
 
             //Request error by 200
-            if(data['meta']['code'] !== 200) {
+            if(data.meta.code !== 200) {
                 alert("Fail to get response from foursquare!");
-                console.log("Request Failed by response " + data['meta']['code']);
+                console.log("Request Failed by response " + data.meta.code);
                 return null;
             }
 
             //No proper response here
-            var res = data['response']['venues'][0];
+            var res = data.response.venues[0];
             if(res === undefined) {
                 alert("Fail to get response from foursquare!");
                 console.log("No response value here.");
@@ -61,37 +61,37 @@ var foursquareSearch = {
             var res_checkin = "";
             var res_marker = marker;
 
-            if(res.hasOwnProperty('categories') && res['categories'][0].hasOwnProperty('icon')) {
-                res_photo = res['categories'][0]['icon']['prefix'] + "bg_32" + res['categories'][0]['icon']['suffix'];
+            if(res.hasOwnProperty('categories') && res.categories[0].hasOwnProperty('icon')) {
+                res_photo = res.categories[0].icon.prefix + "bg_32" + res.categories[0].icon.suffix;
             }
             if(res.hasOwnProperty('name')) {
-                res_name = res['name'];
+                res_name = res.name;
             }
             if(res.hasOwnProperty('url')) {
-                res_url = res['url']
+                res_url = res.url;
             }
             if(res.hasOwnProperty('stats')) {
-                res_checkin = res['stats']['checkinsCount'];
+                res_checkin = res.stats.checkinsCount;
             }
 
-            var id = res['id'];
+            var id = res.id;
 
             //Promise chain to get photo urls with a request
             return self.getPhotos(id).then(function(res_photo) {
                 //data for info windows
-                component['photo'] = res_photo;
-                component['name'] = res_name;
-                component['url'] = res_url;
-                component['checkin'] = res_checkin;
-                component['marker'] = res_marker;
+                component.photo = res_photo;
+                component.name = res_name;
+                component.url = res_url;
+                component.checkin = res_checkin;
+                component.marker = res_marker;
 
                 return component;
-            })
+            });
             
         }).then(function(res) {
             console.log(res);
             return res;
-        });;
+        });
     },
     getPhotos: function(id) {
         var self = this;
@@ -108,13 +108,13 @@ var foursquareSearch = {
             var ans = [];
 
             //Request error by 200
-            if(data['meta']['code'] !== 200) {
-                console.log("Request Failed by response " + data['meta']['code']);
+            if(data.meta.code !== 200) {
+                console.log("Request Failed by response " + data.meta.code);
                 return null;
             }
 
             //No proper response here
-            var res = data['response']['photos']['items'];
+            var res = data.response.photos.items;
             if(res === undefined) {
                 console.log("No response value here.");
                 return null;
@@ -132,4 +132,4 @@ var foursquareSearch = {
             return ans;
         });
     }
-}
+};
