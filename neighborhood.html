@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Gift Locations - Where do you buy your special gift?</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -27,18 +28,14 @@
               <option value="20">20 min</option>
               <option value="30">30 min</option>
             </select>
-            <select id="mode">
-              <option value="DRIVING">Drive</option>
-              <option value="WALKING">Walk</option>
-              <option value="BICYCLING">Bike</option>
-              <option value="TRANSIT">Transit Ride</option>
+            <select data-bind="options: mode, optionsText: 'modeName', value: selectedMode" id="mode">
             </select>
             <span class="text">from</span>
-            <input id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY">
+            <input data-bind="value: sourcePlace" id="search-within-time-text" type="text" placeholder="Ex: Google Office NYC or 75 9th Ave, New York, NY">
             <input data-bind="click: searchTimeButtonClicked" id="search-within-time" type="button" value="Go">
             <hr>
             <label>... Or how about these places? &nbsp;</label>
-            <input data-bind="value: filterTitle, valueUpdate: 'input', event: { keyup: searchKeyUp }" id="search-list-text" type="text" placeholder="I want to search places by name!">
+            <input data-bind="value: filterTitle, hotkey: 'enter'" id="search-list-text" type="text" placeholder="I want to search places by name!">
             <div class="scrollable-table">
               <table id="placeTable">
                 <thead>
@@ -50,8 +47,8 @@
                   </tr>
                 </thead>
                 <tbody data-bind="foreach: recommendedPlaces">
-                  <tr>
-                    <td><img class="rounded-img" data-bind="click: onClickIcon, attr: {src: $data.icon}"></td>
+                  <tr data-bind="click: onClickIcon">
+                    <td><img class="rounded-img" data-bind="attr: {src: $data.icon}"></td>
                     <td class="td-th-name" data-bind="text: $data.name"></td>
                     <td data-bind="text: $data.rating"></td>
                     <td data-bind="text: $data.open"></td>
@@ -69,7 +66,8 @@
     <script src="recommendList.js"></script>
     <script async defer
         src=
-        "https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyAC5C50h9LZpQpa4YLtaViVGhw-GYCDeTg&v=3&callback=initMap">
+        "https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyAC5C50h9LZpQpa4YLtaViVGhw-GYCDeTg&v=3&callback=initMap" 
+        onerror="mapError()">
     </script>
 </body>
 </html>

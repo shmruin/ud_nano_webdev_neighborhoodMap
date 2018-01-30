@@ -28,6 +28,10 @@ var icons = {
     }
 };
 
+function mapError() {
+    alert("Error occur during loading google map!");
+}
+
 function initMap() {
     //current location
     var initLocation = new google.maps.LatLng(38.89500, -77.03667);
@@ -48,29 +52,6 @@ function initMap() {
 
     searchWithinCategory();
     setMarkerCurrentLocation(initLocation);
-
-    //Marker reset when 'Category' is changed
-    document.getElementById('gift').addEventListener('change', function () {
-        deleteMarkers();
-        searchWithinCategory();
-        setMarkerCurrentLocation(map.getCenter());
-    });
-
-    //Marker reset when 'Refresh' Button is clicked
-    document.getElementById('search-within-category').addEventListener('click', function () {
-        deleteMarkers();
-        searchWithinCategory();
-        setMarkerCurrentLocation(map.getCenter());
-    });
-
-    //Marker reset when user search places by distance with a location
-    document.getElementById('search-within-time').addEventListener('click', function () {
-        deleteMarkers();
-
-        callSearchWithinTime = true;
-        var address = document.getElementById('search-within-time-text').value;
-        OriginGeocoding(address);
-    });
 }
 
 function hideMarkers() {
@@ -83,7 +64,7 @@ function hideMarkers() {
 function deleteMarkers() {
     hideMarkers();
     markers = [];
-    //deleteRecommendedList();
+    deleteRecommendedList();
 }
 
 function deleteRecommendedList() {
@@ -112,6 +93,15 @@ function setMarkerCurrentLocation(location) {
     });
     infowindow.open(map, current_location);
 
+    current_location.addListener('click', function() {
+        if (current_location.getAnimation() !== null) {
+            current_location.setAnimation(null);
+        } else {
+            current_location.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){ current_location.setAnimation(null); }, 1300);
+        }
+    });
+
     if (current_circle != null) current_circle.setMap(null);
     drawCircle(map.getCenter(), CATEGORY_RADIUS);
 }
@@ -121,18 +111,29 @@ function createPlaceMarker(place) {
         map: map,
         icon: icons['places'].icon,
         position: place.geometry.location,
-        title: place.name
+        title: place.name,
+        animation: google.maps.Animation.DROP,
     });
 
+    //To make recommendedpPlaceList in recommendList.js
+    var recommendedComponent = makeRecommendedpPlaceList(marker, place);
+
     google.maps.event.addListener(marker, 'click', function () {
-        infowindow.setContent(place.name);
-        infowindow.open(map, this);
+        // infowindow.setContent(place.name);
+        // infowindow.open(map, this);
+        open4sqWindowInfo(recommendedComponent);
+    });
+
+    marker.addListener('click', function() {
+        if (marker.getAnimation() !== null) {
+            marker.setAnimation(null);
+        } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){ marker.setAnimation(null); }, 1300);
+        }
     });
 
     markers.push(marker);
-
-    //To make recommendedpPlaceList in recommendList.js
-    makeRecommendedpPlaceList(marker, place);
 }
 
 //Draw a circle area that markers are searched from current location
@@ -166,7 +167,7 @@ function searchWithinCategory(center) {
 
     service = new google.maps.places.PlacesService(map);
     service.nearbySearch(request, nearbySearchCallback);
-}
+}   
 
 function nearbySearchCallback(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -191,7 +192,6 @@ function searchWithinTime(here) {
     var distanceMatrixService = new google.maps.DistanceMatrixService;
     var address = document.getElementById('search-within-time-text').value;
 
-
     // Check to make sure the place entered isn't blank.
     if (address == '') {
         window.alert('You must enter an address.');
@@ -206,7 +206,7 @@ function searchWithinTime(here) {
             destinations[i] = markers[i].position;
         }
 
-        var mode = document.getElementById('mode').value;
+        var mode = vm.selectedMode().value;
 
         distanceMatrixService.getDistanceMatrix({
             origins: [origin],
@@ -332,6 +332,8 @@ function makeRecommendedpPlaceList(marker, place) {
     };
 
     window.recommendedpPlaceList.push(recommendedComponent);
+
+    return recommendedComponent;
 }
 
 //RecommendList actions should be done after this is satisfied
@@ -351,18 +353,19 @@ function WatingListComplete() {
 
 //Show a special info window when recommendList items's icon is clicked.
 function open4sqWindowInfo(recommendedItem) {
+
+    console.log(recommendedItem);
  
     //Request to foursquare by recPlace info
     var lat = recommendedItem.marker.position.lat();
     var lng = recommendedItem.marker.position.lng();
-    var name = recommendedItem.name();
+    var name = recommendedItem.name;
 
     window.foursquareSearch['location'] = lat + ',' + lng;
     window.foursquareSearch['name'] = name;
     
     window.foursquareSearch.setListElements(recommendedItem.marker).then(function(res) {
         //Make and Open special window info of 4sq
-        console.log(res);
 
         if(sqInfowindow !== null) {
             sqInfowindow.close();
@@ -387,27 +390,15 @@ function open4sqWindowInfo(recommendedItem) {
 }
 
 //make marker in map.js
-function makeMarkerList(recList) {
+function makeMarkerList(filtering) {
 
-    deleteMarkers();
-
-    //Put new markers
-    for(var i = 0; i < recList.length; i++) {
-
-        var marker = new google.maps.Marker({
-            map: map,
-            icon: icons['places'].icon,
-            position: recList[i].marker.position,
-            title: recList[i].name
-        });
-
-        google.maps.event.addListener(marker, 'click', function () {
-            infowindow.setContent(this.title);
-            infowindow.open(map, this);
-        });
-
-        markers.push(marker);
-    }
+    markers = markers.filter(function(item) {
+        if(item.getTitle().includes(filtering)) {
+            return true;
+        } else {
+            item.setMap(null);
+        }
+    });
 
     vmFlag = true;
 }
