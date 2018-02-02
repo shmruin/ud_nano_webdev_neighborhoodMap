@@ -1,3 +1,12 @@
+@media screen and (max-width: 500px) {
+  #map, .options-box {
+    width: 100% !important;
+  }
+  .options-box {
+    height: 900px !important;
+  }
+}
+
 html,
       body {
         font-family: Arial, sans-serif;
@@ -8,7 +17,7 @@ html,
 
       .container {
         height: 100%;
-        position: relative;
+        width: 100%;
       }
 
       input {
@@ -30,16 +39,14 @@ html,
       }
 
       #map {
-        bottom:0px;
+        float: left;
         height: 100%;
-        left: 362px;
-        position: absolute;
-        right: 0px;
+        width: calc(100% - 360px);
       }
 
       .options-box {
+        float: left;
         background: #fff;
-        border: 1px solid #999;
         border-radius: 3px;
         height: 100%;
         line-height: 35px;

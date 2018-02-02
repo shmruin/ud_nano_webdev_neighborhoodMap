@@ -129,9 +129,11 @@ var ViewModel = function() {
         }
         
         //1. filter recommendedpPlaceList
-        recommendedpPlaceList = recommendedpPlaceList.filter(function(item) {
+        var filteredList = recommendedpPlaceList.filter(function(item) {
             return item.name.includes(filtering);
         });
+
+        recommendedpPlaceList = filteredList;
 
         //2. Call marker reset function in map.js with recommendedpPlaceList's marker info
         //   Reversal work of 'makeRecommendedpPlaceList'

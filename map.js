@@ -1,22 +1,14 @@
 var map;
-
 var service;
-
 var markers = [];
-
 var placeMarkers = [];
-
 var current_location = null;
-
 var current_circle = null;
+var sqInfowindow = null;
 
 var callSearchWithinTime = false;
-
 var CATEGORY_RADIUS = 10000;
-
 var vmFlag = false;
-
-var sqInfowindow = null;
 
 var iconBase = 'http://labs.google.com/ridefinder/images/';
 var icons = {
@@ -56,7 +48,8 @@ function initMap() {
 
 function hideMarkers() {
     for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap(null);
+        // markers[i].setMap(null);
+        markers[i].setVisible(false);
     }
 }
 
@@ -191,6 +184,8 @@ function searchWithinTime(here) {
     // Initialize the distance matrix service.
     var distanceMatrixService = new google.maps.DistanceMatrixService;
     var address = document.getElementById('search-within-time-text').value;
+
+    console.log(address);
 
     // Check to make sure the place entered isn't blank.
     if (address == '') {

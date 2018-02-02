@@ -24,6 +24,8 @@ var foursquareSearch = {
          res = callback(data);
         }).then(function() {
             return res;
+        }).fail(function() {
+            alert("Error occur while getting data");
         });
     },
     setListElements: function(marker) { //get response and return a list object for recommendedList
